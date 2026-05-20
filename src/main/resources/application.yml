@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: scraping
+
+  datasource:
+    url: jdbc:h2:file:./data/autobrand
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  thymeleaf:
+    cache: false
+
+server:
+  port: 8080
