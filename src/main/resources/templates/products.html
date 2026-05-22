@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout :: head('Products')}"></head>
+<body>
+<div th:replace="~{layout :: header}"></div>
+<main>
+    <div th:if="${message}" class="alert success" th:text="${message}"></div>
+    <div th:if="${error}" class="alert error" th:text="${error}"></div>
+
+    <section class="toolbar">
+        <form th:action="@{/products/scrape}" method="post">
+            <button type="submit" class="btn-primary">Scrape now</button>
+        </form>
+    </section>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Currency</th>
+            <th>Description</th>
+            <th>Updated</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${products}">
+            <td><img th:src="${p.imageUrl}" th:alt="${p.name}" width="80" height="80"></td>
+            <td th:text="${p.name}"></td>
+            <td th:text="${p.price}"></td>
+            <td th:text="${p.currency}"></td>
+            <td class="description" th:text="${p.description}"></td>
+            <td th:text="${p.lastUpdated != null} ? ${#temporals.format(p.lastUpdated, 'yyyy-MM-dd HH:mm')} : '-'"></td>
+            <td class="actions">
+                <a th:href="@{/products/{id}/edit(id=${p.id})}" class="btn">Edit</a>
+                <form th:action="@{/products/{id}/delete(id=${p.id})}" method="post"
+                      onsubmit="return confirm('Delete this product?');">
+                    <button type="submit" class="btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(products)}">
+            <td colspan="7" class="empty">No products yet. Click "Scrape now" to populate the list.</td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

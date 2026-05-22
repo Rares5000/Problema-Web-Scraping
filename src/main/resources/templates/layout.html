@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' — AutoBrand'">AutoBrand</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:fragment="header">
+    <div class="header-inner">
+        <h1>AutoBrand — Web Scraping &amp; Invoices</h1>
+        <nav>
+            <a th:href="@{/products}">Products</a>
+        </nav>
+    </div>
+</header>
+</body>
+</html>
