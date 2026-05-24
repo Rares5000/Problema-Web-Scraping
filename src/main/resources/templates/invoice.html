@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout :: head('Invoice')}"></head>
+<body>
+<div th:replace="~{layout :: header}"></div>
+<main>
+    <div th:if="${message}" class="alert success" th:text="${message}"></div>
+    <div th:if="${error}" class="alert error" th:text="${error}"></div>
+
+    <h2>Upload invoice (PDF)</h2>
+    <p>Select a PDF invoice. The application extracts line items
+        (product code, name, unit price, currency, quantity) and returns them as a CSV file.</p>
+
+    <form th:action="@{/invoice/upload}" method="post" enctype="multipart/form-data" class="form">
+        <label>
+            <span>PDF file</span>
+            <input type="file" name="file" accept="application/pdf" required>
+        </label>
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Upload &amp; download CSV</button>
+            <a th:href="@{/products}" class="btn">Back to products</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

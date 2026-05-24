@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import ro.autobrand.scraping.dto.ScrapingResult;
 import ro.autobrand.scraping.service.ScrapingService;
 
 @Slf4j
@@ -17,8 +18,9 @@ public class ScrapingScheduler {
     public void scheduledScrape() {
         log.info("Cron-triggered scraping run starting");
         try {
-            int count = scrapingService.runScraping();
-            log.info("Cron-triggered scraping run finished: {} product(s) processed", count);
+            ScrapingResult result = scrapingService.runScraping();
+            log.info("Cron-triggered scraping run finished: {} product(s) saved ({} rows scraped)",
+                result.productsSaved(), result.rowsScraped());
         } catch (Exception ex) {
             log.error("Cron-triggered scraping run failed", ex);
         }

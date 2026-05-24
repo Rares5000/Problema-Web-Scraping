@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -44,6 +45,14 @@ public class Product {
 
     @Column(length = 2000)
     private String description;
+
+    @Column(precision = 14, scale = 2)
+    private BigDecimal priceRon;
+
+    @Column(precision = 14, scale = 4)
+    private BigDecimal exchangeRate;
+
+    private LocalDate exchangeRateDate;
 
     private LocalDateTime lastUpdated;
 

@@ -11,15 +11,24 @@
         <form th:action="@{/products/scrape}" method="post">
             <button type="submit" class="btn-primary">Scrape now</button>
         </form>
+        <form th:action="@{/products}" method="get" class="search-form">
+            <input type="text" name="search" th:value="${search}" placeholder="Search by name">
+            <input type="hidden" name="sortBy" th:value="${sortBy}">
+            <input type="hidden" name="dir" th:value="${dir}">
+            <button type="submit" class="btn">Search</button>
+            <a th:href="@{/products}" class="btn" th:if="${search != null and !search.isEmpty()}">Clear</a>
+        </form>
     </section>
 
     <table>
         <thead>
         <tr>
             <th>Image</th>
-            <th>Name</th>
-            <th>Price</th>
+            <th><a th:href="@{/products(search=${search}, sortBy='name', dir=${sortBy == 'name' and dir == 'asc' ? 'desc' : 'asc'})}">Name</a></th>
+            <th><a th:href="@{/products(search=${search}, sortBy='price', dir=${sortBy == 'price' and dir == 'asc' ? 'desc' : 'asc'})}">Price</a></th>
             <th>Currency</th>
+            <th><a th:href="@{/products(search=${search}, sortBy='priceRon', dir=${sortBy == 'priceRon' and dir == 'asc' ? 'desc' : 'asc'})}">Price (RON)</a></th>
+            <th>Rate</th>
             <th>Description</th>
             <th>Updated</th>
             <th>Actions</th>
@@ -31,6 +40,8 @@
             <td th:text="${p.name}"></td>
             <td th:text="${p.price}"></td>
             <td th:text="${p.currency}"></td>
+            <td th:text="${p.priceRon != null} ? ${p.priceRon} : '-'"></td>
+            <td th:text="${p.exchangeRate != null} ? ${p.exchangeRate} : '-'"></td>
             <td class="description" th:text="${p.description}"></td>
             <td th:text="${p.lastUpdated != null} ? ${#temporals.format(p.lastUpdated, 'yyyy-MM-dd HH:mm')} : '-'"></td>
             <td class="actions">
@@ -42,7 +53,7 @@
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(products)}">
-            <td colspan="7" class="empty">No products yet. Click "Scrape now" to populate the list.</td>
+            <td colspan="9" class="empty">No products yet. Click "Scrape now" to populate the list.</td>
         </tr>
         </tbody>
     </table>

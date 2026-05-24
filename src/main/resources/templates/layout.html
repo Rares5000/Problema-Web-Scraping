@@ -12,6 +12,10 @@
         <h1>AutoBrand — Web Scraping &amp; Invoices</h1>
         <nav>
             <a th:href="@{/products}">Products</a>
+            <a th:href="@{/invoice}">Invoice</a>
+            <form th:action="@{/logout}" method="post" class="logout-form">
+                <button type="submit" class="link-btn">Sign out</button>
+            </form>
         </nav>
     </div>
 </header>

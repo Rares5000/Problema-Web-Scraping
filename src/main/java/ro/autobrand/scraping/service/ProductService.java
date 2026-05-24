@@ -2,14 +2,17 @@ package ro.autobrand.scraping.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.autobrand.scraping.domain.Product;
+import ro.autobrand.scraping.dto.ExchangeRate;
 import ro.autobrand.scraping.dto.ProductForm;
 import ro.autobrand.scraping.dto.ScrapedProduct;
 import ro.autobrand.scraping.exception.ProductNotFoundException;
 import ro.autobrand.scraping.repository.ProductRepository;
 
+import java.math.RoundingMode;
 import java.util.List;
 
 @Slf4j
@@ -21,21 +24,27 @@ public class ProductService {
 
     @Transactional
     public Product upsertByName(ScrapedProduct scraped) {
-        return repository.findByName(scraped.name())
-            .map(existing -> updateExisting(existing, scraped))
-            .orElseGet(() -> createNew(scraped));
+        return upsertByName(scraped, null);
     }
 
-    private Product updateExisting(Product existing, ScrapedProduct scraped) {
+    @Transactional
+    public Product upsertByName(ScrapedProduct scraped, ExchangeRate rate) {
+        return repository.findByName(scraped.name())
+            .map(existing -> updateExisting(existing, scraped, rate))
+            .orElseGet(() -> createNew(scraped, rate));
+    }
+
+    private Product updateExisting(Product existing, ScrapedProduct scraped, ExchangeRate rate) {
         existing.setPrice(scraped.price());
         existing.setCurrency(scraped.currency());
         existing.setImageUrl(scraped.imageUrl());
         existing.setDescription(scraped.description());
+        applyExchangeRate(existing, rate);
         log.debug("Updating product '{}'", existing.getName());
         return repository.save(existing);
     }
 
-    private Product createNew(ScrapedProduct scraped) {
+    private Product createNew(ScrapedProduct scraped, ExchangeRate rate) {
         Product product = Product.builder()
             .name(scraped.name())
             .price(scraped.price())
@@ -43,13 +52,31 @@ public class ProductService {
             .imageUrl(scraped.imageUrl())
             .description(scraped.description())
             .build();
+        applyExchangeRate(product, rate);
         log.debug("Creating product '{}'", product.getName());
         return repository.save(product);
+    }
+
+    private void applyExchangeRate(Product product, ExchangeRate rate) {
+        if (rate == null || product.getPrice() == null) {
+            return;
+        }
+        product.setExchangeRate(rate.rate());
+        product.setExchangeRateDate(rate.date());
+        product.setPriceRon(product.getPrice().multiply(rate.rate()).setScale(2, RoundingMode.HALF_UP));
     }
 
     @Transactional(readOnly = true)
     public List<Product> findAll() {
         return repository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> search(String query, Sort sort) {
+        if (query == null || query.isBlank()) {
+            return repository.findAll(sort);
+        }
+        return repository.findByNameContainingIgnoreCase(query.trim(), sort);
     }
 
     @Transactional(readOnly = true)
